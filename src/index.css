@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-body);
+}
+
+:root {
+  /* Surfaces */
+  --background:        #09090B;
+  --background-alt:    #0D0D0F;
+  --card:              #202022;
+  --card-alt:          #252527;
+  --card-deep:         #19191B;
+  --card-foreground:   #F4F4F5;
+
+  /* Text */
+  --foreground:        #F4F4F5;
+  --secondary-text:    #A1A1AA;
+  --muted-foreground:  #71717A;
+
+  /* Borders */
+  --border:            rgba(255,255,255,0.07);
+  --border-subtle:     rgba(255,255,255,0.04);
+
+  /* Brand */
+  --primary:           #785CFF;
+  --primary-light:     #967FFF;
+  --primary-foreground:#FFFFFF;
+  --secondary:         #1A1A1C;
+  --secondary-foreground: #A1A1AA;
+  --muted:             #19191B;
+  --accent:            #785CFF;
+  --accent-foreground: #FFFFFF;
+  --ring:              #785CFF;
+
+  /* Semantic */
+  --water:             #55C7DC;
+  --sewage:            #F0A24E;
+  --stp-color:         #967FFF;
+  --success:           #72C98F;
+  --warning:           #E76055;
+
+  /* Radius */
+  --radius-control:    12px;
+  --radius-card:       20px;
+  --radius-hero:       24px;
+  --radius-button:     24px;
+  --radius-pill:       999px;
+
+  /* Font */
+  --font-body:         "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Easing */
+  --ease-app:          cubic-bezier(.22,1,.36,1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Screen transitions */
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes screenOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-16px); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.screen-in  { animation: screenIn  0.42s var(--ease-app) both; }
+.screen-out { animation: screenOut 0.28s var(--ease-app) both; }
+.fade-up    { animation: fadeUp    0.4s  var(--ease-app) both; }

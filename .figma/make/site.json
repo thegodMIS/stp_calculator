@@ -1,0 +1,10 @@
+{
+  "description": "This interactive web app offers users a visually engaging way to input data and view results through animated gauges and comparison bars, enhancing decision-making.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
