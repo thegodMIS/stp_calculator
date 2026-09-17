@@ -35,13 +35,15 @@ export default function InputScreen({ onResult }: Props) {
     BUILDING_TYPES[0].key
   );
 
-  const [subCategoryKey, setSubCategoryKey] = useState<string>(
-    BUILDING_TYPES[0].subCategories?.[0]?.key ?? ""
-  );
+  const [subCategoryKey, setSubCategoryKey] =
+    useState<string>(
+      BUILDING_TYPES[0].subCategories?.[0]?.key ?? ""
+    );
 
   const [quantity, setQuantity] = useState("250");
 
-  const [isCalculating, setIsCalculating] = useState(false);
+  const [isCalculating, setIsCalculating] =
+    useState(false);
 
   const building = BUILDING_TYPES.find(
     (b) => b.key === buildingKey
@@ -61,9 +63,10 @@ export default function InputScreen({ onResult }: Props) {
   const handleBuildingChange = (key: string) => {
     setBuildingKey(key);
 
-    const selectedBuilding = BUILDING_TYPES.find(
-      (b) => b.key === key
-    )!;
+    const selectedBuilding =
+      BUILDING_TYPES.find(
+        (b) => b.key === key
+      )!;
 
     setSubCategoryKey(
       selectedBuilding.subCategories?.[0]?.key ?? ""
@@ -83,87 +86,127 @@ export default function InputScreen({ onResult }: Props) {
 
     setIsCalculating(true);
 
+    /*
+     * IMPORTANT:
+     * React internally uses keys such as:
+     *   hotel
+     *   5star
+     *
+     * Apps Script expects the actual labels:
+     *   Hotel
+     *   5 Star & Above
+     */
+
+    const selectedSubCategory =
+      building.subCategories?.find(
+        (item) =>
+          item.key === subCategoryKey
+      );
+
     const payload = {
-      architectFirm: project.architect.trim(),
-      mobile: project.mobile.trim(),
-      location: project.location.trim(),
+      architectFirm:
+        project.architect.trim(),
 
-      // IMPORTANT:
-      // Apps Script expects the building key,
-      // not the displayed label.
-      buildingType: building.key,
+      mobile:
+        project.mobile.trim(),
 
-      // Apps Script expects null when there
-      // is no sub-category.
-      subType: subCategoryKey || null,
+      location:
+        project.location.trim(),
+
+      // Send Apps Script the actual building name.
+      buildingType:
+        building.label,
+
+      // Send the actual subtype label.
+      // For single-option building types this will
+      // correctly send values such as "Standard".
+      subType:
+        selectedSubCategory?.label ?? null,
 
       quantity: qty,
     };
 
     try {
-      /**
+      /*
        * STEP 1
-       * Ask Apps Script to perform the calculation.
+       * Calculate using Apps Script.
        */
-      const serverResult = await calculateWaterDemand(payload);
+      const serverResult =
+        await calculateWaterDemand(
+          payload
+        );
 
-      /**
+      /*
        * STEP 2
-       * Convert Apps Script's response into the
-       * STPResult structure already used by
-       * your existing ResultScreen.
+       * Convert Apps Script response to
+       * the existing STPResult structure.
        */
       const result: STPResult = {
-        buildingType: serverResult.buildingType,
+        buildingType:
+          serverResult.buildingType,
 
-        subCategory: serverResult.subType,
+        subCategory:
+          serverResult.subType,
 
-        quantity: serverResult.quantity,
+        quantity:
+          serverResult.quantity,
 
-        quantityUnit: serverResult.unit,
+        quantityUnit:
+          serverResult.unit,
 
-        personsPerUnit: serverResult.personsPerUnit,
+        personsPerUnit:
+          serverResult.personsPerUnit,
 
-        designPopulation: serverResult.designPopulation,
+        designPopulation:
+          serverResult.designPopulation,
 
-        lpcd: serverResult.rate,
+        lpcd:
+          serverResult.rate,
 
-        waterDemandL: serverResult.waterLitres,
+        waterDemandL:
+          serverResult.waterLitres,
 
-        waterDemandKL: serverResult.waterKL,
+        waterDemandKL:
+          serverResult.waterKL,
 
-        sewageKL: serverResult.sewageKL,
+        sewageKL:
+          serverResult.sewageKL,
 
-        stpCapacityKL: serverResult.stpKL,
+        stpCapacityKL:
+          serverResult.stpKL,
 
-        architect: project.architect,
+        architect:
+          project.architect,
 
-        mobile: project.mobile,
+        mobile:
+          project.mobile,
 
-        location: project.location,
+        location:
+          project.location,
       };
 
-      /**
+      /*
        * STEP 3
        * Show the result immediately.
-       *
-       * The user does NOT wait for Sheet1 logging.
        */
       onResult(result);
 
-      /**
+      /*
        * STEP 4
        * Save usage separately.
        *
-       * If saving fails, the calculation result
-       * is still already displayed.
+       * The calculation result does not depend
+       * on successful Sheet1 logging.
        */
-      saveUsage(payload).catch((error) => {
-        console.error(
-          "Usage logging failed:",
-          error
-        );
-      });
+      saveUsage(payload).catch(
+        (error) => {
+          console.error(
+            "Usage logging failed:",
+            error
+          );
+        }
+      );
+
     } catch (error) {
       console.error(
         "STP calculation failed:",
@@ -173,6 +216,7 @@ export default function InputScreen({ onResult }: Props) {
       alert(
         "Unable to calculate right now. Please try again."
       );
+
     } finally {
       setIsCalculating(false);
     }
@@ -185,7 +229,10 @@ export default function InputScreen({ onResult }: Props) {
   return (
     <div
       className="screen-in min-h-screen flex flex-col"
-      style={{ background: "var(--background)" }}
+      style={{
+        background:
+          "var(--background)",
+      }}
     >
       <AppHeader showInfo />
 
@@ -195,13 +242,21 @@ export default function InputScreen({ onResult }: Props) {
           className="font-semibold leading-tight"
           style={{
             fontSize: 30,
-            color: "var(--foreground)",
-            letterSpacing: "-0.01em",
+            color:
+              "var(--foreground)",
+            letterSpacing:
+              "-0.01em",
           }}
         >
           Calculate your
           <br />
-          <span style={{ color: "var(--primary)" }}>
+
+          <span
+            style={{
+              color:
+                "var(--primary)",
+            }}
+          >
             STP requirement
           </span>
         </h1>
@@ -209,12 +264,13 @@ export default function InputScreen({ onResult }: Props) {
         <p
           className="mt-2 text-sm leading-relaxed"
           style={{
-            color: "var(--muted-foreground)",
+            color:
+              "var(--muted-foreground)",
             maxWidth: "32ch",
           }}
         >
-          Quick indicative calculation based on
-          building water-consumption standards.
+          Quick indicative calculation based
+          on building water-consumption standards.
         </p>
       </div>
 
@@ -225,10 +281,12 @@ export default function InputScreen({ onResult }: Props) {
         <ProjectCard
           values={project}
           onChange={(key, value) =>
-            setProject((previous) => ({
-              ...previous,
-              [key]: value,
-            }))
+            setProject(
+              (previous) => ({
+                ...previous,
+                [key]: value,
+              })
+            )
           }
         />
 
@@ -236,16 +294,21 @@ export default function InputScreen({ onResult }: Props) {
         <div
           className="flex flex-col gap-5 p-5"
           style={{
-            background: "var(--card)",
-            borderRadius: "var(--radius-card)",
-            border: "1px solid var(--border)",
+            background:
+              "var(--card)",
+            borderRadius:
+              "var(--radius-card)",
+            border:
+              "1px solid var(--border)",
           }}
         >
           <p
             className="text-xs font-semibold uppercase tracking-widest"
             style={{
-              color: "var(--muted-foreground)",
-              letterSpacing: "0.12em",
+              color:
+                "var(--muted-foreground)",
+              letterSpacing:
+                "0.12em",
             }}
           >
             Project Inputs
@@ -255,7 +318,9 @@ export default function InputScreen({ onResult }: Props) {
             label="Building Type"
             options={buildingOptions}
             value={buildingKey}
-            onChange={handleBuildingChange}
+            onChange={
+              handleBuildingChange
+            }
           />
 
           {hasSubCategory && (
@@ -263,36 +328,48 @@ export default function InputScreen({ onResult }: Props) {
               label={
                 building.key === "hotel"
                   ? "Hotel Category"
-                  : building.key === "hospital"
+                  : building.key ===
+                    "hospital"
                   ? "Hospital Category"
-                  : building.key === "school"
+                  : building.key ===
+                    "school"
                   ? "School Type"
                   : "Type"
               }
               options={subOptions}
               value={subCategoryKey}
-              onChange={setSubCategoryKey}
+              onChange={
+                setSubCategoryKey
+              }
             />
           )}
 
           <QuantityCard
-            label={building.quantityLabel}
+            label={
+              building.quantityLabel
+            }
             value={quantity}
             onChange={setQuantity}
-            unit={building.quantityUnit}
+            unit={
+              building.quantityUnit
+            }
           />
         </div>
 
         {/* Rate preview chip */}
         <RateChip
           building={building}
-          subCategoryKey={subCategoryKey}
+          subCategoryKey={
+            subCategoryKey
+          }
         />
 
         {/* CTA */}
         <div className="pt-2">
           <PrimaryButton
-            onClick={handleCalculate}
+            onClick={
+              handleCalculate
+            }
             disabled={!isValid}
             fullWidth
           >
@@ -313,7 +390,9 @@ function RateChip({
   building,
   subCategoryKey,
 }: {
-  building: (typeof BUILDING_TYPES)[0];
+  building:
+    (typeof BUILDING_TYPES)[0];
+
   subCategoryKey: string;
 }) {
   let lpcd: number;
@@ -323,12 +402,17 @@ function RateChip({
     building.noSubCategory ||
     !building.subCategories
   ) {
-    lpcd = building.defaultRate!;
-    label = building.label;
+    lpcd =
+      building.defaultRate!;
+
+    label =
+      building.label;
   } else {
     const sub =
       building.subCategories.find(
-        (s) => s.key === subCategoryKey
+        (s) =>
+          s.key ===
+          subCategoryKey
       ) ??
       building.subCategories[0];
 
@@ -340,15 +424,19 @@ function RateChip({
     <div
       className="flex items-center gap-2 px-4 py-2 self-start"
       style={{
-        background: "var(--card-deep)",
-        borderRadius: "var(--radius-pill)",
-        border: "1px solid var(--border)",
+        background:
+          "var(--card-deep)",
+        borderRadius:
+          "var(--radius-pill)",
+        border:
+          "1px solid var(--border)",
       }}
     >
       <span
         className="w-1.5 h-1.5 rounded-full"
         style={{
-          background: "var(--water)",
+          background:
+            "var(--water)",
           boxShadow:
             "0 0 4px var(--water)",
         }}
@@ -357,13 +445,15 @@ function RateChip({
       <span
         className="text-xs"
         style={{
-          color: "var(--secondary-text)",
+          color:
+            "var(--secondary-text)",
         }}
       >
         {label} ·{" "}
         <strong
           style={{
-            color: "var(--water)",
+            color:
+              "var(--water)",
           }}
         >
           {lpcd} LPCD
